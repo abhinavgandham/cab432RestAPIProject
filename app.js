@@ -1,7 +1,10 @@
 const express = require('express');
 const path = require('path');
+const env = require('dotenv');
 const { handleFileUpload } = require('./src/middleware/fileUpload');
 const app = express();
+
+env.config();
 
 app.use(express.json());
 
@@ -21,5 +24,5 @@ app.post('/upload', handleFileUpload, (req, res) => {
     });
 })
 
-const PORT = 3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
