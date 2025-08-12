@@ -1,0 +1,20 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "tstark123",
+      "password": "$2b$10$iOkuUcWVj.1jYJkwrrBxQ.57w9gcUQR4udyl99CN5hygASx3s/LlS",
+      "role": "admin",
+      "email": "admin@company.com",
+      "fullName": "Tony Stark"
+    },
+    {
+      "id": 2,
+      "username": "sParker123",
+      "password": "$2b$10$pKVkeNGUGDGdc57RMXxmCOjVZFtYq5bZ2iCCG4ZsjSEN5BmzO735i",
+      "role": "normal user",
+      "email": "user1@company.com",
+      "fullName": "Peter Parker"
+    }
+  ]
+}

@@ -1,15 +1,17 @@
 const express = require('express');
 const path = require('path');
-const env = require('dotenv');
+const env = require('dotenv')
 const { handleFileUpload } = require('./src/middleware/fileUpload');
+const authRoutes = require('./src/routes/authRoutes');
 const app = express();
 
 env.config();
 
 app.use(express.json());
+app.use('/api/auth', authRoutes);
 
 app.get('/', (req,res) => {
-    res.json({message: 'Document Converter Application is running!'});
+    res.json({message: 'PDF Converter Application is running!'});
 });
 
 app.post('/upload', handleFileUpload, (req, res) => {
