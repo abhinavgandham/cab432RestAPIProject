@@ -1,28 +1,28 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
+// const fs = require('fs');
 
-const uploadDir = path.join(__dirname, '../uploads');
-const tempDir = path.join(__dirname, '../temp');
+// const uploadDir = path.join(__dirname, '../uploads');
+// const tempDir = path.join(__dirname, '../temp');
 
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir, { recursive: true });
-}
+// if (!fs.existsSync(uploadDir)) {
+//     fs.mkdirSync(uploadDir, { recursive: true });
+// }
+// if (!fs.existsSync(tempDir)) {
+//     fs.mkdirSync(tempDir, { recursive: true });
+// }
 
-// Setting up storage
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, tempDir);
-    },
-    filename: (req, file, cb) => {
-        // Generate unique filename with timestamp
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    }
-})
+// // Setting up storage
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         cb(null, tempDir);
+//     },
+//     filename: (req, file, cb) => {
+//         // Generate unique filename with timestamp
+//         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+//         cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+//     }
+// })
 
 // File filter for allowed file types
 const fileFilter = (req, file, callBack) => {
@@ -42,10 +42,10 @@ const fileFilter = (req, file, callBack) => {
 }
 
 const uploadFile = multer({
-    storage: storage,
+    storage: multer.memoryStorage(),
     fileFilter: fileFilter,
     limits: {
-        fileSize: 20 * 1024 * 1024, // 10MB limit
+        fileSize: 20 * 1024 * 1024, // 20MB limit
         files: 1 // Only 1 file per request
     }
 })
@@ -62,11 +62,16 @@ const handleFileUpload = (req, res, next) => {
         }
         // Handling other error types
         if (err) {
-            err.message === 'Unsupported file extension' ? res.status(400).json({
-                message: err.message
-            }) : res.status(500).json({
-                message: 'An error occurred while uploading the file.'
-            })
+            if (err.message === 'Unsupported file extension') {
+                return res.status(400).json({
+                    message: err.message
+                })
+            }
+            else {
+                return res.status(500).json({
+                    message: 'An error occurred while uploading the file.'
+                })
+            }
         }
         next();
     });
