@@ -1,6 +1,5 @@
 const express = require('express');
 const env = require('dotenv')
-const { handleFileUpload } = require('./src/middleware/fileUpload');
 const authRoutes = require('./src/routes/authRoutes');
 const fileRoutes = require('./src/routes/fileRoutes');
 const app = express();
