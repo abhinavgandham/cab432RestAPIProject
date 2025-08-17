@@ -2,7 +2,6 @@ const express = require('express');
 const { upload } = require('../controllers/uploadController');
 const { convertFile } = require('../controllers/conversionController');
 const { handleFileUpload } = require('../middleware/fileUpload');
-const { handleFileConvert } = require('../middleware/fileConvert');
 
 const router = express.Router();
 
