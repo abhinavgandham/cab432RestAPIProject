@@ -29,7 +29,6 @@ const login = async (req, res) => {
             });
         }
 
-        // Compare password with hashed password
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {

@@ -1,5 +1,6 @@
 const multer = require('multer');
 const path = require('path');
+const authenticateToken = require('./auth');
 
 // File filter for allowed file types
 const fileFilter = (req, file, callBack) => {
@@ -30,6 +31,7 @@ const uploadFile = multer({
 const uploadSingleFile = uploadFile.single('file');
 
 const handleFileUpload = (req, res, next) => {
+
     uploadSingleFile(req, res, (err) => {
         // If the file is too large, return an error
         if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
