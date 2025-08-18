@@ -1,4 +1,18 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs');
+const path = require('path');
+
+// Load jobs with safety check
+let jobs;
+try {
+    jobs = require('../../jobs.json');
+    if (!jobs || !jobs.jobs) {
+        jobs = { jobs: [] };
+    }
+} catch (error) {
+    console.log('Creating new jobs.json file');
+    jobs = { jobs: [] };
+}
 
 const htmlToPdf = async (htmlContent) => {
     let browser;
@@ -61,6 +75,22 @@ const docxToPdf = async (docxBuffer) => {
     }
 };
 
+const createJob = (jobId,originalFileName, convertedFileName, fileType, userName, fullName, jobResult, timeStamp, fileSize, pdfSize) => {
+    const job = {
+        jobId,
+        originalFileName,
+        convertedFileName,
+        fileType,
+        userName,
+        fullName,
+        jobResult,
+        timeStamp,
+        fileSize,
+        pdfSize,
+    }
+    return job;
+}
+
 const handleFileConvert = async (req, res) => {
     try {
         const file = req.file;
@@ -71,6 +101,7 @@ const handleFileConvert = async (req, res) => {
         console.log('Processing file:', file.originalname, 'Size:', file.size);
 
         const fileName = file.originalname;
+        const convertedFileName = fileName.replace(/\.(html|md|docx)$/, '.pdf');
         const fileExtension = fileName.split('.').pop().toLowerCase();
 
         let pdfBuffer;
@@ -94,9 +125,34 @@ const handleFileConvert = async (req, res) => {
 
         console.log('PDF generated, size:', pdfBuffer.length);
 
+        // Create job record BEFORE sending response
+        try {
+            const username = req.user ? req.user.username : 'anonymous';
+            const fullName = req.user ? req.user.fullName : 'anonymous';
+            const job = createJob(
+                `${username}-${fileExtension}-${Date.now().toString()}`,
+                fileName,
+                convertedFileName,
+                fileExtension,
+                username,
+                fullName,
+                'success',
+                new Date().toISOString(),
+                file.size,
+                pdfBuffer.length,
+            );
+            jobs.jobs.push(job);
+
+            // Write to jobs.json file
+            fs.writeFileSync(path.join(__dirname, '../jobs.json'), JSON.stringify(jobs, null, 2));
+        } catch (jobError) {
+            console.error('Job creation error:', jobError);
+            // Don't fail the conversion if job creation fails
+        }
+
         // Set proper headers
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${fileName.replace(/\.(html|md|docx)$/, '.pdf')}"`);
+        res.setHeader('Content-Disposition', `attachment; filename="${convertedFileName}"`);
         res.setHeader('Content-Length', pdfBuffer.length);
 
         // Send the PDF buffer directly

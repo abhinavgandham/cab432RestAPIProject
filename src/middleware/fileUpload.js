@@ -31,7 +31,6 @@ const uploadFile = multer({
 const uploadSingleFile = uploadFile.single('file');
 
 const handleFileUpload = (req, res, next) => {
-
     uploadSingleFile(req, res, (err) => {
         // If the file is too large, return an error
         if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
