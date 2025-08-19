@@ -7,6 +7,6 @@ const { authenticateToken }= require('../middleware/auth');
 const router = express.Router();
 
 router.post('/upload', authenticateToken, handleFileUpload, upload);
-router.post('/convert', authenticateToken, handleFileUpload, convertFile);
+router.post('/convert', authenticateToken, convertFile);
 
 module.exports = router;

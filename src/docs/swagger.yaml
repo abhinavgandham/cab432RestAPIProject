@@ -1,0 +1,242 @@
+openapi: 3.1.0
+info:
+  title: PDF Converter API
+  version: 1.0.0
+  description: API for converting various file formats to PDF
+servers:
+  - url: http://localhost:3000
+    description: Development server
+
+paths:
+  /api/auth/login:
+    post:
+      summary: User login
+      tags: [Authentication]
+      description: Login to the application using your username and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  description: The username to login with
+                  example: "tonyStark123"
+                password:
+                  type: string
+                  description: The password to login with
+                  example: "jarvis123"
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login successful"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        401:
+          description: Invalid username or password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid username or password"
+
+  /api/auth/logout:
+    post:
+      summary: User logout
+      description: Logout user and invalidate token
+      tags: [Authentication]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Logout successful"
+        401:
+          description: Failed to logout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Unauthorized"
+
+  /api/file/upload:
+    post:
+      summary: Upload file for conversion
+      description: Upload a file and convert it to PDF format
+      tags: [Files]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File to upload
+      responses:
+        200:
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "File uploaded successfully"
+                  jobId:
+                    type: string
+                    example: "job_12345"
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+
+  /api/file/convert:
+    post:
+      summary: Convert uploaded file
+      description: Convert an uploaded file to PDF format
+      tags: [Files]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: File converted successfully
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+
+  /api/job/getAllJobs:
+    get:
+      summary: Get all jobs (Admin only)
+      description: Retrieve all conversion jobs across all users (admin role required)
+      tags: [Jobs]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of all jobs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobs:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Job'
+        403:
+          description: Forbidden - Admin role required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized"
+        404:
+          description: No jobs found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No jobs found"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Error fetching jobs"
+        401:
+          description: Unauthorized
+
+  /api/job/getJobs:
+    get:
+      summary: Get user jobs
+      description: Retrieve conversion jobs for the authenticated user
+      tags: [Jobs]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: List of user jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Job'
+        404:
+          description: No jobs found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No jobs found"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Error fetching jobs"
+        401:
+          description: Unauthorized
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
