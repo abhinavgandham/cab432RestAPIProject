@@ -201,7 +201,7 @@ const docxToPdf = async (docxBuffer) => {
     }
 };
 
-const createJob = (jobId,originalFileName, convertedFileName, fileType, userName, fullName, jobResult, timeStamp, fileSize, pdfSize) => {
+const createJob = (jobId,originalFileName, convertedFileName, fileType, userName, fullName, jobResult, timeStamp, fileSize, pdfSize, downloadUrl) => {
     const job = {
         jobId,
         originalFileName,
@@ -213,6 +213,7 @@ const createJob = (jobId,originalFileName, convertedFileName, fileType, userName
         timeStamp,
         fileSize,
         pdfSize,
+        downloadUrl
     }
     return job;
 }
@@ -252,12 +253,22 @@ const handleFileConvert = async (req, res) => {
 
         console.log('PDF generated, size:', pdfBuffer.length);
 
+        const conversionsDir = path.join(__dirname, '../conversions');
+        if (!fs.existsSync(conversionsDir)) {
+            fs.mkdirSync(conversionsDir, { recursive: true });
+        }
+
+        const timestamp = Date.now();
+        const uniquePdfName = `${req.user.username}_${fileExtension}_${timestamp}.pdf`;
+        const pdfPath = path.join(conversionsDir, uniquePdfName);
+        fs.writeFileSync(pdfPath, pdfBuffer);
+
         // Create job record BEFORE sending response
         try {
             const username = req.user ? req.user.username : 'anonymous';
             const fullName = req.user ? req.user.fullName : 'anonymous';
             const job = createJob(
-                `${username}-${fileExtension}-${Date.now().toString()}`,
+                `${username}-${fileExtension}-${Date.now()}`,
                 fileName,
                 convertedFileName,
                 fileExtension,
@@ -267,6 +278,7 @@ const handleFileConvert = async (req, res) => {
                 new Date().toISOString(),
                 file.size,
                 pdfBuffer.length,
+                `/api/file/download/${uniquePdfName}`
             );
             jobs.jobs.push(job);
 
@@ -277,13 +289,14 @@ const handleFileConvert = async (req, res) => {
             // Don't fail the conversion if job creation fails
         }
 
-        // Set proper headers
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename="${convertedFileName}"`);
-        res.setHeader('Content-Length', pdfBuffer.length);
-
-        // Send the PDF buffer directly
-        res.end(pdfBuffer);
+        res.json({
+            message: "File converted successfully",
+            jobId: `${username}-${fileExtension}-${timestamp}`,
+            originalFile: fileName,
+            convertedFile: convertedFileName,
+            downloadUrl: `/api/file/download/${uniquePdfName}`,
+            fileSize: pdfBuffer.length
+        })
 
     } catch (error) {
         console.error('Conversion error:', error);

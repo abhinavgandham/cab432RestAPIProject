@@ -141,6 +141,32 @@ paths:
           description: Bad request
         401:
           description: Unauthorized
+  /api/file/download/{filename}:
+    get:
+      summary: Download converted file
+      description: Download a converted PDF file
+      tags: [Files]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The filename to download
+      responses:
+        200:
+          description: File download
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        404:
+          description: File not found
+        401:
+          description: Unauthorized
 
   /api/job/getAllJobs:
     get:
