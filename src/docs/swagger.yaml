@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: PDF Converter API
   version: 1.0.0
-  description: API for converting various file formats to PDF
+  description: API for converting html, markdown, and docx files to PDF
 servers:
   - url: http://localhost:3000
     description: Development server
@@ -186,7 +186,35 @@ paths:
                   jobs:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Job'
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "job_12345"
+                        userId:
+                          type: string
+                          example: "user_67890"
+                        originalFilename:
+                          type: string
+                          example: "document.docx"
+                        convertedFilename:
+                          type: string
+                          example: "document.pdf"
+                        status:
+                          type: string
+                          enum: [pending, processing, completed, failed]
+                          example: "completed"
+                        createdAt:
+                          type: string
+                          format: date-time
+                          example: "2024-01-15T10:30:00Z"
+                        updatedAt:
+                          type: string
+                          format: date-time
+                          example: "2024-01-15T10:35:00Z"
+                        error:
+                          type: string
+                          example: "Conversion failed due to invalid file format"
         403:
           description: Forbidden - Admin role required
           content:
@@ -235,7 +263,35 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Job'
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: "job_12345"
+                    userId:
+                      type: string
+                      example: "user_67890"
+                    originalFilename:
+                      type: string
+                      example: "document.docx"
+                    convertedFilename:
+                      type: string
+                      example: "document.pdf"
+                    status:
+                      type: string
+                      enum: [pending, processing, completed, failed]
+                      example: "completed"
+                    createdAt:
+                      type: string
+                      format: date-time
+                      example: "2024-01-15T10:30:00Z"
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      example: "2024-01-15T10:35:00Z"
+                    error:
+                      type: string
+                      example: "Conversion failed due to invalid file format"
         404:
           description: No jobs found
           content:
@@ -260,6 +316,8 @@ paths:
           description: Unauthorized
 
 components:
+
+
 
   securitySchemes:
     bearerAuth:
