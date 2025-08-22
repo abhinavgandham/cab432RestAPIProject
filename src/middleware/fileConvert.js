@@ -25,11 +25,24 @@ const htmlToPdf = async (htmlContent) => {
                 '--disable-dev-shm-usage',
                 '--disable-gpu',
                 '--disable-web-security',
-                '--disable-features=VizDisplayCompositor'
-            ]
+                '--disable-features=VizDisplayCompositor',
+                '--disable-extensions',
+                '--disable-plugins',
+                '--disable-images',
+                '--disable-javascript',
+                '--disable-background-timer-throttling',
+                '--disable-backgrounding-occluded-windows',
+                '--disable-renderer-backgrounding'
+            ],
+            timeout: 300000 // 5 minutes for browser launch
         });
 
         const page = await browser.newPage();
+
+        // Set page timeouts for large files
+        await page.setDefaultTimeout(300000); // 5 minutes default timeout
+        await page.setDefaultNavigationTimeout(300000); // 5 minutes navigation timeout
+
         await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
         await page.setContent(htmlContent, {
             waitUntil: 'domcontentloaded' // Use simpler wait condition
@@ -43,7 +56,8 @@ const htmlToPdf = async (htmlContent) => {
                 right: '20mm',
                 bottom: '20mm',
                 left: '20mm'
-            }
+            },
+            timeout: 300000 // 5 minutes for PDF generation
         });
 
         return pdf;
