@@ -37,8 +37,6 @@ const login = async (req, res) => {
                 message: 'Invalid username or password'
             });
         }
-
-        // Generating the JWT token
         const payload = {
             userId: user.id,
             username: user.username,
@@ -46,8 +44,7 @@ const login = async (req, res) => {
             email: user.email
         };
 
-        // You should set this in your environment variables
-        const JWT_SECRET = process.env.JWT_SECRET || 'pEGGo9RxVryWiWVGahB2zEPF1yJcpuiRtDXO6xZaXEfAmcFkTUrpkUOVPE5KTJL8VBYcCBxInHmYMpf+QM4P7g==';
+        const JWT_SECRET = process.env.JWT_SECRET_KEY;
         const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
 
         // Return success response with token

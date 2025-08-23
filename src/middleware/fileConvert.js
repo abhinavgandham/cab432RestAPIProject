@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
+const mammoth = require('mammoth');
 
 // Load jobs with safety check
 let jobs;
@@ -14,9 +15,11 @@ try {
     jobs = { jobs: [] };
 }
 
+
 const htmlToPdf = async (htmlContent) => {
     let browser;
     try {
+        // Optimized Puppeteer configuration for better performance
         browser = await puppeteer.launch({
             headless: 'new',
             args: [
@@ -32,21 +35,40 @@ const htmlToPdf = async (htmlContent) => {
                 '--disable-javascript',
                 '--disable-background-timer-throttling',
                 '--disable-backgrounding-occluded-windows',
-                '--disable-renderer-backgrounding'
+                '--disable-renderer-backgrounding',
+                '--single-process',
+                '--no-zygote',
+                '--memory-pressure-off',
+                '--max_old_space_size=4096',
             ],
-            timeout: 300000 // 5 minutes for browser launch
+            timeout: 60000,
+            protocolTimeout: 60000
         });
 
         const page = await browser.newPage();
 
-        // Set page timeouts for large files
-        await page.setDefaultTimeout(300000); // 5 minutes default timeout
-        await page.setDefaultNavigationTimeout(300000); // 5 minutes navigation timeout
+        await page.setDefaultTimeout(120000);
+        await page.setDefaultNavigationTimeout(120000);
 
+        // Optimize page settings
         await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
-        await page.setContent(htmlContent, {
-            waitUntil: 'domcontentloaded' // Use simpler wait condition
+
+        // Disable unnecessary features for better performance
+        await page.setRequestInterception(true);
+        page.on('request', (req) => {
+            if (['image', 'stylesheet', 'font'].includes(req.resourceType())) {
+                req.abort();
+            } else {
+                req.continue();
+            }
         });
+
+        await page.setContent(htmlContent, {
+            waitUntil: 'domcontentloaded',
+            timeout: 60000
+        });
+
+        await page.waitForTimeout(1000);
 
         const pdf = await page.pdf({
             format: 'A4',
@@ -57,7 +79,7 @@ const htmlToPdf = async (htmlContent) => {
                 bottom: '20mm',
                 left: '20mm'
             },
-            timeout: 300000 // 5 minutes for PDF generation
+            timeout: 120000
         });
 
         return pdf;
@@ -66,15 +88,17 @@ const htmlToPdf = async (htmlContent) => {
         throw error;
     } finally {
         if (browser) {
-            await browser.close();
+            try {
+                await browser.close();
+            } catch (closeError) {
+                console.error('Error closing browser:', closeError);
+            }
         }
     }
 };
 
 const docxToPdf = async (docxBuffer) => {
     try {
-        const mammoth = require('mammoth');
-
         console.log('Converting DOCX to PDF using Mammoth with enhanced table support...');
 
         const options = {
