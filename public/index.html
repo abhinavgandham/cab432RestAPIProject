@@ -9,6 +9,7 @@
     <script src="login.js" defer></script>
     <script src="upload.js" defer></script>
     <script src="convert.js" defer></script>
+    <script src="download.js" defer></script>
 </head>
 
 <body>
@@ -69,15 +70,8 @@
     <!-- Download Section -->
     <div class="section download-section">
         <h2>⬇️ Download PDF</h2>
-        <div id="downloadSection" style="display: none;">
-            <p><strong>Conversion completed!</strong> Your PDF is ready for download.</p>
-            <a href="#" id="downloadLink" class="download-btn" target="_blank">
-                Download PDF
-            </a>
-            <p><strong>File:</strong> <span id="convertedFileName"></span></p>
-            <p><strong>Size:</strong> <span id="convertedFileSize"></span></p>
-        </div>
-        <div id="downloadStatus"></div>
+        <div id="downloadLink"></div>
+        <div id="downloadMessage"></div>
     </div>
 </body>
 

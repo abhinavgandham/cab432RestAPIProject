@@ -136,21 +136,38 @@
 }
 
 .download-btn {
-    background: #e74c3c;
+    background: #27ae60;
     color: white;
     padding: 12px 24px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
-    margin: 10px;
     text-decoration: none;
     display: inline-block;
     transition: background-color 0.3s ease;
 }
 
 .download-btn:hover {
-    background: #c0392b;
+    background: #229954;
+}
+
+.download-btn:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+}
+
+.download-section {
+    display: none;
+}
+
+#downloadMessage {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    min-height: 20px;
 }
 
 .file-info {
