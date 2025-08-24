@@ -12,7 +12,7 @@ const login = async () => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ username, password })
-        })
+        });
         const data = await response.json();
         if (response.ok && data.data.token) {
             messageDiv.innerHTML = '✅ Login successful';

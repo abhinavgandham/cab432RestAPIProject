@@ -68,7 +68,8 @@ const htmlToPdf = async (htmlContent) => {
             timeout: 60000
         });
 
-        await page.waitForTimeout(1000);
+        // Use a more reliable wait method instead of waitForTimeout
+        await page.waitForFunction(() => document.readyState === 'complete', { timeout: 60000 });
 
         const pdf = await page.pdf({
             format: 'A4',

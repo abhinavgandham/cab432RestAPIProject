@@ -1,8 +1,7 @@
-// Global variables to track current file and conversion state
-let currentFile = null;
-let currentJobId = null;
 const token = localStorage.getItem('token');
-const messageArea = document.querySelector('#uploadMessage');
+const uploadMessageArea = document.querySelector('#uploadMessage');
+let currentFile = null;
+let uploadedFileName = null; // Store the uploaded filename globally
 
 const openFilePicker = () => {
     const fileInput = document.querySelector('#fileInput');
@@ -22,7 +21,6 @@ const selectFile = async () => {
 
     const file = fileInput.files[0];
 
-    // Store current file globally
     currentFile = file;
 
     // Display file info
@@ -31,7 +29,14 @@ const selectFile = async () => {
     fileType.textContent = file.type || 'Unknown';
     fileInfo.style.display = 'block';
     uploadBtn.disabled = false;
-    convertBtn.disabled = true; // Disable until upload is complete
+    convertBtn.disabled = true;
+
+    // Clear any previous uploaded filename when selecting a new file
+    uploadedFileName = null;
+    window.uploadedFileName = null;
+
+    // Reset convert button state
+    convertBtn.disabled = true;
 
     // Clear any previous messages
     showMessage('File selected successfully!', 'success');
@@ -47,14 +52,14 @@ const formatFileSize = (bytes) => {
 
 const upload = async () => {
     if (!currentFile) {
-        messageArea.textContent = 'No file selected';
+        uploadMessageArea.textContent = 'No file selected';
         return;
     }
 
     // Check if user is logged in
     const token = localStorage.getItem('token');
     if (!token) {
-        messageArea.textContent = 'Please login first';
+        uploadMessageArea.textContent = 'Please login first';
         return;
     }
 
@@ -80,19 +85,21 @@ const upload = async () => {
         const result = await response.json();
 
         if (response.ok) {
-            messageArea.textContent = 'File uploaded successfully!';
+            uploadMessageArea.textContent = 'File uploaded successfully!';
+            uploadedFileName = currentFile.name; // Store the uploaded filename
+            window.uploadedFileName = uploadedFileName; // Make it globally accessible
             convertBtn.disabled = false; // Enable conversion after successful upload
             uploadBtn.textContent = 'Upload File';
         } else if (response.status === 401) {
-            messageArea.textContent = 'Unauthorized: Please login again';
+            uploadMessageArea.textContent = 'Unauthorized: Please login again';
             uploadBtn.textContent = 'Upload File';
         } else {
-            messageArea.textContent = `Error uploading file: ${result.message || 'Unknown error'}`;
+            uploadMessageArea.textContent = `Error uploading file: ${result.message || 'Unknown error'}`;
             uploadBtn.textContent = 'Upload File';
         }
     } catch(error) {
         console.error('Error uploading file:', error);
-        messageArea.textContent = 'Network error: Unable to upload file';
+        uploadMessageArea.textContent = 'Network error: Unable to upload file';
         uploadBtn.textContent = 'Upload File';
     }
 
@@ -100,8 +107,8 @@ const upload = async () => {
 }
 
 const showMessage = (message, type = 'info') => {
-    messageArea.textContent = message;
-    messageArea.className = `message-area ${type}`;
+    uploadMessageArea.textContent = message;
+    uploadMessageArea.className = `message-area ${type}`;
 }
 
 // Initialize the application
