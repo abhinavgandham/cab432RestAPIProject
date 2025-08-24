@@ -1,6 +1,5 @@
 const multer = require('multer');
 const path = require('path');
-const authenticateToken = require('./auth');
 
 // File filter for allowed file types
 const fileFilter = (req, file, callBack) => {
@@ -35,7 +34,7 @@ const handleFileUpload = (req, res, next) => {
         // If the file is too large, return an error
         if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
             return res.status(400).json({
-                message: 'File is too large. Maximum file size is 20MB.'
+                message: 'File is too large. Maximum file size is 100MB.'
             });
         }
         // Handling other error types
