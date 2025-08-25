@@ -19,7 +19,6 @@ try {
 const htmlToPdf = async (htmlContent) => {
     let browser;
     try {
-        // Optimized Puppeteer configuration for better performance
         browser = await puppeteer.launch({
             headless: 'new',
             args: [
@@ -35,20 +34,15 @@ const htmlToPdf = async (htmlContent) => {
                 '--disable-javascript',
                 '--disable-background-timer-throttling',
                 '--disable-backgrounding-occluded-windows',
-                '--disable-renderer-backgrounding',
-                '--single-process',
-                '--no-zygote',
-                '--memory-pressure-off',
-                '--max_old_space_size=4096',
+                '--disable-renderer-backgrounding'
             ],
-            timeout: 60000,
-            protocolTimeout: 60000
+            timeout: 300000
         });
 
         const page = await browser.newPage();
 
-        await page.setDefaultTimeout(120000);
-        await page.setDefaultNavigationTimeout(120000);
+        await page.setDefaultTimeout(300000); // 5 minutes default timeout
+        await page.setDefaultNavigationTimeout(300000); // 5 minutes navigation timeout
 
         // Optimize page settings
         await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
@@ -80,7 +74,7 @@ const htmlToPdf = async (htmlContent) => {
                 bottom: '20mm',
                 left: '20mm'
             },
-            timeout: 120000
+            timeout: 300000
         });
 
         return pdf;
