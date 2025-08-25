@@ -1,6 +1,7 @@
 const token = localStorage.getItem('token');
 const uploadMessageArea = document.querySelector('#uploadMessage');
 let currentFile = null;
+
 let uploadedFileName = null; // Store the uploaded filename globally
 
 const openFilePicker = () => {

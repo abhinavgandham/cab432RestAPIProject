@@ -15,17 +15,15 @@ const convert = async () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      // No body needed - backend gets file from user's session
     });
          if (response.status === 200) {
        const result = await response.json();
 
        convertMessageArea.textContent = "✅ Conversion completed";
 
-       // Set up download link with proper structure
        const downloadLink = document.querySelector("#downloadLink");
        if (downloadLink && result.downloadUrl) {
-         // Extract filename from download URL
+
          const filename = result.downloadUrl.split('/').pop();
 
          downloadLink.innerHTML = `
