@@ -6,7 +6,6 @@ const fileRoutes = require('./src/routes/fileRoutes');
 const jobRoutes = require('./src/routes/jobRoutes');
 const fs = require('fs');
 const path = require('path');
-const yaml = require('js-yaml');
 const loadSwaggerDocument = require('./src/swagger.js');
 const app = express();
 
